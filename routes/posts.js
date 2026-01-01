@@ -37,4 +37,28 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// GET /posts → tutti i post pubblicati
+router.get('/', async (req, res) => {
+  try {
+    const posts = await Post.find({ published: true }).sort({ createdAt: -1 });
+    res.json(posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Errore server' });
+  }
+});
+
+// GET /posts/:slug → singolo post per slug
+router.get('/:slug', async (req, res) => {
+  try {
+    const post = await Post.findOne({ slug: req.params.slug, published: true });
+    if (!post) return res.status(404).json({ message: 'Post non trovato' });
+    res.json(post);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Errore server' });
+  }
+});
+
+
 module.exports = router;
