@@ -14,11 +14,24 @@ function slugify(text) {
     .replace(/\-\-+/g, '-');
 }
 
+function generateExcerpt(text, length = 150) {
+  if (!text) return '';
+
+  const plainText = text
+    .replace(/<\/?[^>]+(>|$)/g, '') // rimuove HTML
+    .trim();
+
+  return plainText.length > length
+    ? plainText.substring(0, length) + '…'
+    : plainText;
+}
+
+
 // CREAZIONE POST
 router.post('/', authenticateToken, async (req, res) => {
   try {
     const slug = slugify(req.body.title);
-
+    const excerpt = generateExcerpt(req.body.content);
     const post = new Post({
       ...req.body,
       slug
@@ -50,6 +63,11 @@ router.put('/:id', authenticateToken, async (req, res) => {
       updateData,
       { new: true }
     );
+
+    if (req.body.content) {
+      updateData.excerpt = generateExcerpt(req.body.content);
+    }
+
 
     if (!post) {
       return res.status(404).json({ message: 'Post non trovato' });
