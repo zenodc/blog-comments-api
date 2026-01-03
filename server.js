@@ -5,7 +5,9 @@ const authRoutes = require('./routes/auth');
 const app = express();
 const postsRoutes = require('./routes/posts');
 
-app.use(cors());
+app.use(cors({
+  origin: "https://redapple-lreq.onrender.com"
+}));
 app.use(express.json());
 app.use('/auth', authRoutes);
 app.use('/posts', postsRoutes);
