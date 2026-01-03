@@ -32,6 +32,7 @@ router.post('/', authenticateToken, async (req, res) => {
   try {
     const slug = slugify(req.body.title);
     const excerpt = generateExcerpt(req.body.content);
+    console.log('GENERATED EXCERPT:', excerpt); // <<< log importante
     const post = new Post({
       ...req.body,
       slug
