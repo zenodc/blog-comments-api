@@ -30,18 +30,17 @@ function generateExcerpt(text, length = 150) {
 // CREAZIONE POST
 router.post('/', authenticateToken, async (req, res) => {
   try {
-    console.log('REQ.BODY:', req.body);
     const slug = slugify(req.body.title);
     const excerpt = generateExcerpt(req.body.content);
-    console.log('GENERATED EXCERPT:', excerpt); // <<< log importante
+
     const post = new Post({
-      ...req.body,
-      slug
+      ...req.body, // title, content
+      slug,
+      excerpt      // inserito qui: così Mongoose lo salva
     });
 
     await post.save();
     res.status(201).json(post);
-
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -60,16 +59,16 @@ router.put('/:id', authenticateToken, async (req, res) => {
       updateData.slug = slugify(req.body.title);
     }
 
+    // Se cambia il contenuto, rigenera l'excerpt
+    if (req.body.content) {
+      updateData.excerpt = generateExcerpt(req.body.content);
+    }
+
     const post = await Post.findByIdAndUpdate(
       req.params.id,
       updateData,
       { new: true }
     );
-
-    if (req.body.content) {
-      updateData.excerpt = generateExcerpt(req.body.content);
-    }
-
 
     if (!post) {
       return res.status(404).json({ message: 'Post non trovato' });
@@ -81,6 +80,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
 
 // CANCELLAZIONE POST
 router.delete('/:id', authenticateToken, async (req, res) => {
