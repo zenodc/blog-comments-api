@@ -30,6 +30,7 @@ function generateExcerpt(text, length = 150) {
 // CREAZIONE POST
 router.post('/', authenticateToken, async (req, res) => {
   try {
+    console.log('REQ.BODY:', req.body);
     const slug = slugify(req.body.title);
     const excerpt = generateExcerpt(req.body.content);
     console.log('GENERATED EXCERPT:', excerpt); // <<< log importante
